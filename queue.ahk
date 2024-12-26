@@ -22,11 +22,11 @@ class Queue {
     }
 
     isEmpty() {
-        return this.data.MaxIndex() = 0
+        return this.data.Length <= 0
     }
 
     size() {
-        return this.data.MaxIndex()
+        return this.data.Length
     }
 }
 
@@ -50,15 +50,15 @@ class Stack {
         if (this.isEmpty()) {
             return ""
         }
-        return this.data[this.data.MaxIndex()]
+        return this.data[this.data.Length]
     }
 
     isEmpty() {
-        return this.data.MaxIndex() = 0
+        return this.data.Length <= 0
     }
 
     size() {
-        return this.data.MaxIndex()
+        return this.data.Length
     }
 }
 
@@ -100,43 +100,45 @@ class Deque {
         if (this.isEmpty()) {
             return "" 
         }
-        return this.data[this.data.MaxIndex()]
+        return this.data[this.data.Length]
     }
 
     isEmpty() {
-        return this.data.MaxIndex() = 0
+        return this.data.Length <= 0
     }
 
     size() {
-        return this.data.MaxIndex() 
+        return this.data.Length
     }
 }
 
 class BinaryHeap {
-    __New(isMinHeap := true, comparator := this._compare) {
+    __New(isMinHeap := true, comparator := BinaryHeap._defaultcompare) {
         this.heap := []
         this.isMinHeap := isMinHeap
-        this._compare := comparator
+        this._compare := comparator.Bind(,,, this.isMinHeap)
     }
 
     insert(value) {
         this.heap.Push(value) 
-        this._heapifyUp(this.heap.MaxIndex()) 
+        this._heapifyUp(this.heap.Length) 
     }
 
     removeRoot() {
         if (this.isEmpty()) {
             return ""
         }
-
-        root := this.heap[1] 
-        this.heap[1] := this.heap.Pop() 
-        this._heapifyDown(1) 
+        root := this.heap[1]
+        lastElement := this.heap.pop()
+        if (this.heap.Length > 0) {
+            this.heap[1] := lastElement
+            this._heapifyDown(1)
+        }
         return root
     }
 
     isEmpty() {
-        return this.heap.MaxIndex() = 0
+        return this.heap.length <= 0
     }
 
     _heapifyUp(index) {
@@ -152,7 +154,7 @@ class BinaryHeap {
     }
 
     _heapifyDown(index) {
-        size := this.heap.MaxIndex()
+        size := this.heap.Length
         while (true) {
             leftChildIndex := this._getLeftChildIndex(index)
             rightChildIndex := this._getRightChildIndex(index)
@@ -175,8 +177,8 @@ class BinaryHeap {
         }
     }
 
-    _compare(a, b) {
-        if (this.isMinHeap) {
+    static _defaultcompare(a, b, isMinHeap) {
+        if (isMinHeap) {
             return a < b
         } else {
             return a > b
@@ -203,15 +205,15 @@ class BinaryHeap {
 }
 
 class PriorityQueue {
-    __New(isMinHeap := true, comparator := BinaryHeap._compare) {
-        this.heap := BinaryHeap(isMinHeap, comparator)
+    __New(isMinHeap := true, comparator?) {
+        this.heap := IsSet(comparator) ? BinaryHeap(isMinHeap, comparator) : BinaryHeap(isMinHeap)
     }
 
-    insert(value) {
+    push(value) {
         this.heap.insert(value)
     }
 
-    remove() {
+    pop() {
         return this.heap.removeRoot()
     }
 
